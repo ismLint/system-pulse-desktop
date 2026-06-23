@@ -1,0 +1,52 @@
+.center { display:flex; align-items:center; justify-content:center; min-height:200px; }
+
+.addBtn {
+  background: var(--accent); color: #fff; padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500;
+  font-family: var(--font-sans); cursor: pointer; transition: background var(--transition);
+}
+.addBtn:hover { background: var(--accent-bright); }
+
+.statsRow { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 0.875rem; margin-bottom: 1.5rem; }
+
+.sectionLabel {
+  font-size: 0.7rem; font-weight: 500; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.07em; font-family: var(--font-mono);
+  margin-bottom: 0.75rem;
+}
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(250px,1fr)); gap: 0.875rem; }
+
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 1rem;
+  text-decoration: none; display: flex; flex-direction: column; gap: 0.875rem;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+
+.cardTop { display: flex; align-items: center; gap: 0.625rem; }
+.cardIcon {
+  width: 34px; height: 34px; border-radius: var(--radius-md);
+  background: var(--accent-dim); border: 1px solid var(--accent);
+  color: var(--accent-bright); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.cardMeta { flex: 1; min-width: 0; }
+.cardName { display:block; font-size:0.875rem; font-weight:500; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cardHost { display:block; font-size:0.7rem; color:var(--text-muted); font-family:var(--font-mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.mini { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.miniStat {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 0.4rem 0.6rem;
+  display: flex; flex-direction: column; gap: 0.1rem;
+}
+.miniLabel { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.miniValue { font-size: 0.85rem; font-weight: 700; font-family: var(--font-mono); }
+
+.noData { font-size: 0.775rem; color: var(--text-muted); text-align: center; padding: 0.5rem; }
+
+.cardFooter {
+  display: flex; align-items: center; justify-content: flex-end; gap: 0.2rem;
+  font-size: 0.75rem; color: var(--text-muted); margin-top: auto;
+}

@@ -1,0 +1,45 @@
+.bar {
+  height: var(--titlebar-height);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.75rem;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon { color: var(--accent); }
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn {
+  width: 28px; height: 24px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.close:hover { background: rgba(244,63,94,0.2); color: var(--danger); }

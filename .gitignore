@@ -1,0 +1,38 @@
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Desktop frontend
+desktop/node_modules/
+desktop/dist/
+desktop/.cache/
+
+# Env
+.env
+**/.env
+**/.env.*
+!**/.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri build outputs
+desktop/src-tauri/gen/
+*.dmg
+*.deb
+*.AppImage
+*.msi
+*.exe
+
+# Local sqlite files (desktop dev runs, server backups)
+*.db
+*.db-wal
+*.db-shm
+docker/backups/

@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/system-pulse-db",
+    "crates/system-pulse-server",
+    "desktop/src-tauri",
+]
+
+# The desktop crate builds a cdylib/staticlib for Tauri and is normally
+# driven by `tauri dev` / `tauri build`, not `cargo build` directly — but
+# keeping it in the workspace means `cargo check --workspace` and
+# `cargo test -p system-pulse-db` share one dependency graph and one
+# target/ directory, so CI only compiles shared deps once.
+
+[workspace.package]
+edition = "2021"
+
+[profile.release]
+opt-level     = 3
+lto           = true
+codegen-units = 1
+strip         = true

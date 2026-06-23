@@ -1,0 +1,110 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 210px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+.logoIcon { color: var(--accent); }
+.logoText { font-family: var(--font-mono); font-size: 0.825rem; color: var(--text-secondary); }
+.logoText strong { color: var(--accent-bright); }
+
+.nav {
+  flex: 1;
+  padding: 0.75rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.8375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+  border: 1px solid transparent;
+}
+.navItem:hover { background: var(--bg-hover); color: var(--text-primary); }
+.active {
+  background: var(--accent-dim) !important;
+  color: var(--accent-bright) !important;
+  border-color: rgba(59,130,246,0.3) !important;
+}
+
+.sidebarBottom {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent-bright);
+  font-weight: 700; font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.userMeta { flex: 1; min-width: 0; }
+.userName {
+  display: block; font-size: 0.775rem; color: var(--text-primary); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userSub {
+  display: block; font-size: 0.65rem; color: var(--text-muted);
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.logoutBtn {
+  background: none; color: var(--text-muted); padding: 0.3rem;
+  border-radius: var(--radius-sm); display: flex; align-items: center;
+  transition: color var(--transition), background var(--transition);
+}
+.logoutBtn:hover { color: var(--danger); background: rgba(244,63,94,0.1); }
+
+/* ── Content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.5rem;
+}

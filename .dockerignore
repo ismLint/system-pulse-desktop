@@ -1,0 +1,10 @@
+# Only crates/system-pulse-db and crates/system-pulse-server are needed
+# for the server image — everything else is excluded so Docker's build
+# context stays small and never touches Tauri-only dependencies.
+desktop/
+docker/backups/
+*.md
+.git/
+.gitignore
+target/
+**/target/

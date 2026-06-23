@@ -1,0 +1,25 @@
+.wrap {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1rem 0.5rem;
+  transition: border-color var(--transition);
+}
+.wrap:hover { border-color: var(--border-bright); }
+
+.head {
+  display: flex; align-items: baseline;
+  justify-content: space-between; margin-bottom: 0.5rem;
+}
+.title {
+  font-size: 0.7rem; font-weight: 500; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.07em; font-family: var(--font-mono);
+}
+.current { font-size: 1.1rem; font-weight: 700; font-family: var(--font-mono); line-height: 1; }
+
+.tip {
+  background: var(--bg-overlay); border: 1px solid var(--border-bright);
+  border-radius: var(--radius-md); padding: 0.4rem 0.6rem; font-family: var(--font-mono);
+}
+.tipTime { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 0.15rem; }
+.tipVal  { font-size: 0.8rem; font-weight: 700; }
