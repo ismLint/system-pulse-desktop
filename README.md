@@ -1,11 +1,13 @@
-# System Pulse
+# <p align="center">System Pulse</p>
 
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361dafb)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-
+<p align="center">
+  <img src="https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white" alt="Rust" />
+  <img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361dafb" alt="React" />
+  <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
 
 Мониторинг серверов в двух форматах, использующих общий слой базы данных:
+...
 
 - **Десктопное приложение (Tauri)** — подход local-first, файл SQLite хранится в директории данных приложений ОС (app-data).
 - **Автономный сервер (Axum)** — та же схема SQLite, развертывается через Docker с постоянным томом (persistent volume).
