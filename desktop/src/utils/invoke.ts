@@ -1,7 +1,6 @@
 import { invoke as tauriInvoke } from '@tauri-apps/api/core'
 import { useAuthStore } from '@/store/authStore'
 
-/** Wrap tauri invoke — auto-injects token, normalizes errors */
 export async function invoke<T>(
   cmd: string,
   args: Record<string, unknown> = {}

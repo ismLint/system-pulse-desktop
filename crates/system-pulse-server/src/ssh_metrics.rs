@@ -1,14 +1,10 @@
-//! Collect metrics from a remote Linux server via SSH (sshpass + ssh).
-//! One SSH session per collection cycle — runs a single multi-line shell script.
 
 use anyhow::{Context, Result};
 use std::process::{Command, Stdio};
 
 use system_pulse_db::models::metric::MetricInput;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared shell script — works on any standard Linux
-// ─────────────────────────────────────────────────────────────────────────────
+// shared shell script — works on any standard Linux
 const COLLECT_SCRIPT: &str = r#"
 #!/bin/sh
 # CPU usage
@@ -83,9 +79,7 @@ else
 fi
 "#;
 
-// ─────────────────────────────────────────────────────────────────────────────
 // SSH execution
-// ─────────────────────────────────────────────────────────────────────────────
 
 fn run_ssh(host: &str, user: &str, password: &str, script: &str) -> Result<String> {
     // Try sshpass first (password auth)
@@ -140,9 +134,7 @@ fn run_ssh(host: &str, user: &str, password: &str, script: &str) -> Result<Strin
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Parse output
-// ─────────────────────────────────────────────────────────────────────────────
 
 fn parse_f64(s: &str) -> Option<f64> { s.trim().parse().ok() }
 fn parse_i64(s: &str) -> Option<i64> { s.trim().parse().ok() }
@@ -212,17 +204,13 @@ fn parse_output(raw: &str, server_id: &str) -> MetricInput {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Public API
-// ─────────────────────────────────────────────────────────────────────────────
+// public API
 
-/// Collect metrics from a remote Linux host via SSH
 pub fn collect_remote(server_id: &str, host: &str, user: &str, password: &str) -> Result<MetricInput> {
     let raw = run_ssh(host, user, password, COLLECT_SCRIPT)?;
     Ok(parse_output(&raw, server_id))
 }
 
-/// Test SSH connectivity — return OS info string on success
 pub fn test_connection(host: &str, user: &str, password: &str) -> Result<String> {
     run_ssh(host, user, password, "uname -sr && hostname && echo 'OK'")
 }

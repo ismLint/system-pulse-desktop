@@ -1,10 +1,16 @@
 # System Pulse
 
-Server monitoring, in two shapes that share one database layer:
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361dafb)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-- **Desktop app** (Tauri) — local-first, SQLite file under the OS app-data dir
-- **Standalone server** (Axum) — same SQLite schema, deployed via Docker with a persistent volume
 
+Мониторинг серверов в двух форматах, использующих общий слой базы данных:
+
+- **Десктопное приложение (Tauri)** — подход local-first, файл SQLite хранится в директории данных приложений ОС (app-data).
+- **Автономный сервер (Axum)** — та же схема SQLite, развертывается через Docker с постоянным томом (persistent volume).
+
+## Структура
 ```
 system-pulse/
 ├── Cargo.toml                      ← workspace root
@@ -14,33 +20,53 @@ system-pulse/
 ├── desktop/                         ← Tauri app (src-tauri/ depends on system-pulse-db too)
 └── docker/                          ← server Dockerfile, compose, backup/restore scripts
 ```
+## Возможности
 
-## Why a separate `system-pulse-db` crate
-
-Both binaries need identical behavior for users, servers, and metrics —
-same columns, same migrations, same uniqueness rules. Before this split,
-that logic was duplicated (and could silently drift) between the desktop
-app and any future server. Now:
-
-- `system-pulse-db` owns the schema, migrations, and every SQL query
-- The desktop app calls `Database::connect(DatabaseConfig::at_path(app_data_dir))`
-- The server calls `Database::connect(DatabaseConfig::from_env())`, reading
-  `DATABASE_PATH` (defaults to `/data/system_pulse.db`, the Docker volume mount)
-
-A `.db` file produced by one binary opens correctly in the other — same
-tables, same indexes, same triggers.
+- Локальная аутентификация (пароли Argon2, JWT хранится на устройстве)
+- Сбор метрик через SSH — никаких агентов на удаленном сервере
+- Графики в реальном времени: CPU, RAM, температура, Disk I/O, сеть, Load Average
+- База данных SQLite хранится в %APPDATA%\system-pulse-desktop\system_pulse.db
+- Кастомное окно без рамок с нативными кнопками управления в заголовке
+- Опрос метрик каждые 5 секунд через фоновые задачи Tauri + события (events)
+---
 
 ---
 
-## Running the shared db crate's tests
+## Как работает сбор метрик через SSH 
 
-No external database needed — tests run against `sqlite::memory:`:
+1. Пользователь добавляет сервер, указывая хост, SSH-пользователя и пароль.
+2. Пароль шифруется с помощью XOR и сохраняется в SQLite.
+3. На странице Server Detail (Детали сервера) Tauri запускает асинхронную фоновую задачу.
+4. Каждые 5 секунд задача выполняет shell-скрипт на удаленном хосте через sshpass + ssh.
+5. Скрипт собирает данные о CPU, RAM, дисковом вводе-выводе, сети, температуре, load average и аптайме.
+6. Результат сохраняется в SQLite и отправляется как Tauri-событие metric:<server_id>.
+7. Фронтенд-хук React useMetrics слушает эти события и добавляет данные на график.
+
+Никаких агентов, никакого проброса — только стандарный SSH.
+---
+
+## Зачем нужен отдельный `system-pulse-db` крейт
+
+Оба бинарника должны иметь идентичную логику для пользователей, серверов и метрик — те же колонки, те же миграции, те же правила уникальности. До разделения эта логика дублировалась (и могла незаметно разойтись) между десктопным приложением и будущим сервером. Теперь:
+
+- `system-pulse-db` полностью управляет схемой, миграциями и каждым SQL-запросом.
+- Десктопное приложение вызывает `Database::connect(DatabaseConfig::at_path(app_data_dir))`
+- Сервер вызывает `Database::connect(DatabaseConfig::from_env())`, считывая
+  `DATABASE_PATH` (по умолчанию `/data/system_pulse.db`, точка монтирования Docker)
+
+Файл .db, созданный одним бинарником, корректно открывается в другом — те же таблицы, те же индексы, те же триггеры.
+
+---
+
+## Запуск общего крейта бд
+
+Внешняя база данных не требуется — тесты выполняются в памяти `sqlite::memory:`:
 
 ```bash
 cargo test -p system-pulse-db
 ```
 
-## Running the server locally (no Docker)
+## Локальный запуск сервера (без Docker)
 
 ```bash
 cd crates/system-pulse-server
@@ -48,89 +74,81 @@ export JWT_SECRET=$(openssl rand -hex 32)
 export SERVER_ENC_KEY=$(openssl rand -hex 32)
 export DATABASE_PATH=./dev.db
 cargo run
-# -> listening on 0.0.0.0:8090
+# 
 ```
 
-## Deploying the server with Docker
+## Развертывание сервера с помощью Docker
 
 ```bash
 cd system-pulse/
 cp docker/.env.example docker/.env
-# edit docker/.env — set JWT_SECRET and SERVER_ENC_KEY
-#   openssl rand -hex 32   (run twice, once per secret)
+# docker/.env — укажите JWT_SECRET и SERVER_ENC_KEY
 
 docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build
 ```
 
-The SQLite file lives in the `sqlite_data` named volume, mounted at
-`/data/system_pulse.db` inside the container. It survives container
-restarts and `docker compose down` (without `-v`).
+Файл SQLite находится в именованном томе sqlite_data, который примонтирован по пути /data/system_pulse.db внутри контейнера. Он сохраняется при перезапусках контейнера и выполнении команды docker compose down (без флага -v).
 
-### Backup / restore
+### Резервное копирование / Восстановление
 
 ```bash
-# Snapshot the live database to ./backups/system_pulse_<timestamp>.db
 ./docker/backup.sh
 
-# Restore a snapshot (stops + restarts the container)
 ./docker/restore.sh ./backups/system_pulse_20260620_120000.db
 ```
 
-### Health check
+### Проверка работоспособности
 
 ```bash
-curl http://localhost:8090/health
-# {"status":"ok","db":"ok"}
+curl http://{host}:8090/health
+
+#Поменять {host} на свой.
+
+#Нормальный ответ: {"status":"ok","db":"ok"}
 ```
 
 ---
 
-## Running the desktop app
+## Запуск десктоп приложения
 
 ```bash
 cd desktop
 npm install
 npm run tauri:dev      # dev mode
-npm run tauri:build    # Windows .msi / .exe — see desktop/README.md
+npm run tauri:build    # Windows .msi / .exe
 ```
 
 ---
 
-## API surface (server)
+## Стуктура API (сервер)
 
-| Method | Path                              | Auth         | Notes |
-|--------|------------------------------------|--------------|-------|
-| POST   | `/api/auth/register`              | —            | |
-| POST   | `/api/auth/login`                 | —            | |
-| POST   | `/api/auth/logout`                | Bearer       | revokes current session |
-| GET    | `/api/auth/me`                    | Bearer       | |
-| POST   | `/api/account/changepassword`     | Bearer       | revokes all sessions |
-| POST   | `/api/account/changeemail`        | Bearer       | |
-| POST   | `/api/account/changelogin`        | Bearer       | |
-| GET    | `/api/servers`                    | Bearer       | |
-| POST   | `/api/servers`                    | Bearer       | |
-| GET    | `/api/servers/:id`                | Bearer       | |
-| PUT    | `/api/servers/:id`                | Bearer       | |
-| DELETE | `/api/servers/:id`                | Bearer       | |
-| GET    | `/api/metrics/:server_id`         | Bearer       | `?limit=120` |
-| GET    | `/api/metrics/:server_id/latest`  | Bearer       | |
-| POST   | `/api/metrics/:server_id/collect` | Bearer       | SSH-collects once, only for `server_type = "remote"` |
-| GET    | `/health`                         | —            | |
+| Method | Path                              | Auth         | Notes                                                |
+|--------|------------------------------------|--------------|------------------------------------------------------|
+| POST   | `/api/auth/register`              | —            |                                                      |
+| POST   | `/api/auth/login`                 | —            |                                                      |
+| POST   | `/api/auth/logout`                | Bearer       | отзывает текущую сессию                              |
+| GET    | `/api/auth/me`                    | Bearer       |                                                      |
+| POST   | `/api/account/changepassword`     | Bearer       | отзывает все сессии                                  |
+| POST   | `/api/account/changeemail`        | Bearer       |                                                      |
+| POST   | `/api/account/changelogin`        | Bearer       |                                                      |
+| GET    | `/api/servers`                    | Bearer       |                                                      |
+| POST   | `/api/servers`                    | Bearer       |                                                      |
+| GET    | `/api/servers/:id`                | Bearer       |                                                      |
+| PUT    | `/api/servers/:id`                | Bearer       |                                                      |
+| DELETE | `/api/servers/:id`                | Bearer       |                                                      |
+| GET    | `/api/metrics/:server_id`         | Bearer       | `?limit=120`                                         |
+| GET    | `/api/metrics/:server_id/latest`  | Bearer       |                                                      |
+| POST   | `/api/metrics/:server_id/collect` | Bearer       | однократный сбор по SSH, только для server_type = "remote" |
+| GET    | `/health`                         | —            |                                                      |
 
-Sessions are tracked server-side (the `sessions` table) so logout and
-password changes can revoke tokens immediately — something the desktop
-app doesn't need, since it never sends its JWT anywhere over a network.
+
+Сессии отслеживаются на стороне сервера (таблица sessions), поэтому выход из системы (logout) и смена пароля могут мгновенно отозвать токены. Десктопному приложению это не требуется, так как оно никогда не отправляет свой JWT по сети.
 
 ---
 
-## Security notes
+## Заметки по безопасности
 
-- Passwords hashed with Argon2id
-- JWTs signed HS256; the server additionally stores a SHA-256 hash of each
-  issued token so it can revoke sessions without needing a JWT blocklist
-  service
-- SSH passwords are XOR+hex "encrypted" at rest — replace with AES-256-GCM
-  before using this for anything beyond a homelab; set `SERVER_ENC_KEY` /
-  the desktop's equivalent constant to a real secret either way
-- The server container runs as a non-root user and only ships
-  `sshpass` + `openssh-client` — no SSH server, no other attack surface
+- Пароли хэшируются с помощью Argon2id.
+- JWT подписываются алгоритмом HS256; сервер дополнительно хранит SHA-256 хэш каждого выпущенного токена, что позволяет отзывать сессии без использования отдельного сервиса блэклистов JWT.
+- SSH-пароли при хранении «зашифрованы» с помощью XOR+hex — замените это на AES-256-GCM перед использованием проекта где-либо за пределами домашней лаборатории (homelab); в любом случае установите SERVER_ENC_KEY / аналогичную константу в десктопе в значение реального секрета.
+- Контейнер сервера работает от пользователя без прав root и содержит только sshpass + openssh-client — внутри нет SSH-сервера, что минимизирует вектор атаки.

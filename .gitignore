@@ -31,7 +31,6 @@ desktop/src-tauri/gen/
 *.msi
 *.exe
 
-# Local sqlite files (desktop dev runs, server backups)
 *.db
 *.db-wal
 *.db-shm

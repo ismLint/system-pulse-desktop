@@ -23,8 +23,6 @@ pub struct AppState {
     pub config: Arc<AppConfig>,
 }
 
-// Allows extractors written against `AppState` to also work if axum ever
-// nests this inside a larger state struct (kept simple here — direct).
 // impl FromRef<AppState> for AppState {
 //     fn from_ref(state: &AppState) -> Self {
 //         state.clone()

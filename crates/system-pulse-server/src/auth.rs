@@ -45,8 +45,6 @@ pub fn extract_bearer(header: &str) -> Option<&str> {
     header.strip_prefix("Bearer ")
 }
 
-/// We never store raw JWTs in the `sessions` table — only a SHA-256 hash,
-/// so a leaked database file doesn't hand out usable tokens directly.
 pub fn hash_token(token: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(token.as_bytes());

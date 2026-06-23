@@ -83,7 +83,7 @@ pub async fn login(db: State<'_, Database>, input: LoginInput) -> AppResult<Auth
 
 #[tauri::command]
 pub async fn logout() -> AppResult<()> {
-    Ok(()) // Desktop keeps tokens client-side only; nothing to revoke locally.
+    Ok(())
 }
 
 #[tauri::command]

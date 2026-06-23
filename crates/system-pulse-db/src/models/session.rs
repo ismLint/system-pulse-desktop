@@ -1,9 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-/// Server-side session record. The desktop app does not create rows here
-/// (it keeps JWTs purely client-side), but the table is always present so
-/// the schema is identical across both binaries — the server populates it
-/// to support logout and multi-device session revocation.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Session {
     pub id: String,

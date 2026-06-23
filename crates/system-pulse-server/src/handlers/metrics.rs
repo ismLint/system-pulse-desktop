@@ -41,9 +41,6 @@ pub async fn get_latest(
     Ok(Json(m))
 }
 
-/// Trigger an immediate collection for a remote server (SSH) and persist it.
-/// Local-machine collection only makes sense on the desktop app, so the
-/// server only ever does the "remote" branch.
 pub async fn collect_now(
     State(state): State<AppState>,
     AuthUser(user_id): AuthUser,

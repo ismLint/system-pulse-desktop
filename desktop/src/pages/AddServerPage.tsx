@@ -22,7 +22,6 @@ export default function AddServerPage() {
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null)
   const [error, setError]   = useState<string | null>(null)
 
-  // Local mode: auto-fill host/user fields
   const handleModeChange = (m: Mode) => {
     setMode(m)
     setTestResult(null)

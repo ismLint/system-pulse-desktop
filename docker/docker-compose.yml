@@ -1,19 +1,10 @@
 version: "3.9"
 
-# Deploys the standalone system-pulse-server with a persistent SQLite
-# volume. The exact same database schema (and the same system-pulse-db
-# crate) is used by the desktop app — copying the .db file between a
-# server deployment and a desktop install just works.
-#
-# Usage:
-#   cd system-pulse/
-#   cp docker/.env.example docker/.env   # fill in JWT_SECRET, SERVER_ENC_KEY
-#   docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build
 
 services:
   server:
     build:
-      context: ..              # repo root — Dockerfile copies crates/* from here
+      context: ..
       dockerfile: docker/Dockerfile
     container_name: system_pulse_server
     restart: unless-stopped
@@ -30,9 +21,6 @@ services:
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
       RUST_LOG: ${RUST_LOG:-info}
     volumes:
-      # Named volume — survives `docker compose down`, only removed with
-      # `docker compose down -v`. This is the single file that holds every
-      # user, server, and metric row.
       - sqlite_data:/data
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8090/health"]

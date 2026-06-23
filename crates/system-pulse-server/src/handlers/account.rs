@@ -50,7 +50,6 @@ pub async fn change_password(
     )
     .await?;
 
-    // Changing the password invalidates all existing sessions.
     sessions::revoke_all_for_user(&state.db.pool, &user_id).await?;
 
     Ok(Json(serde_json::json!({ "status": "ok" })))

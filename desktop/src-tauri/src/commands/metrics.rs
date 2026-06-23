@@ -103,10 +103,9 @@ pub async fn start_polling(
 
 #[tauri::command]
 pub async fn stop_polling(_server_id: String) -> AppResult<()> {
-    Ok(()) // Frontend stops listening; background task exits on next error.
+    Ok(()) 
 }
 
-// ─── Dispatch: local vs remote ───────────────────────────────────────────────
 
 async fn do_collect(server: &Server) -> AppResult<system_pulse_db::models::metric::MetricInput> {
     if server.server_type == "local" {

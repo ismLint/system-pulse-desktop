@@ -27,7 +27,6 @@ export function useMetrics(serverId: string | undefined, limit = 120) {
   const startPolling = useCallback(async () => {
     if (!serverId) return
     try {
-      // Listen for Tauri events from background polling task
       const unlisten = await listen<Metric>(`metric:${serverId}`, (event) => {
         setMetrics(prev => {
           const next = [...prev, event.payload]

@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-# docker/backup.sh — snapshot the live SQLite database out of the running
-# container into a timestamped file on the host.
-#
-# SQLite's `.backup` command is safe to run against a live database (it
-# uses the same locking the WAL mode already relies on), so this does not
-# require stopping the server.
 set -euo pipefail
 
 CONTAINER="system_pulse_server"

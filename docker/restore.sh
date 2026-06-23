@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# docker/restore.sh — restore a previously backed-up SQLite file into the
-# running server's volume. Stops the server first so nothing writes to the
-# file mid-copy, then restarts it.
 set -euo pipefail
 
 CONTAINER="system_pulse_server"

@@ -11,7 +11,6 @@ pub struct Server {
     pub password_encrypted: String,
     pub description: Option<String>,
     pub is_active: bool,
-    /// "local" or "remote"
     pub server_type: String,
     pub created_at: String,
     pub updated_at: String,

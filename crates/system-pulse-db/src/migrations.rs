@@ -1,10 +1,3 @@
-//! Schema migrations.
-//!
-//! These run automatically on every `Database::connect()` call, so both the
-//! desktop app and the server self-migrate on startup — no separate migration
-//! step is required when deploying a new server version, as long as all
-//! migrations here remain additive (`CREATE TABLE IF NOT EXISTS`, `ALTER TABLE
-//! ADD COLUMN` guarded with `let _ =`) so older rows are never destroyed.
 
 use sqlx::SqlitePool;
 use tracing::info;
@@ -52,7 +45,6 @@ pub async fn run_migrations(pool: &SqlitePool) -> DbResult<()> {
     .await
     .map_err(DbError::Sqlx)?;
 
-    // Upgrade path for databases created before `server_type` existed.
     let _ = sqlx::query("ALTER TABLE servers ADD COLUMN server_type TEXT NOT NULL DEFAULT 'remote'")
         .execute(pool)
         .await;
@@ -93,9 +85,6 @@ pub async fn run_migrations(pool: &SqlitePool) -> DbResult<()> {
     .await
     .map_err(DbError::Sqlx)?;
 
-    // Auto-cleanup: keep only the last 7 days of metrics. On the server this
-    // matters a lot more than on desktop, since multiple servers' worth of
-    // metrics accumulate in the same file.
     sqlx::query(
         "CREATE TRIGGER IF NOT EXISTS cleanup_old_metrics
          AFTER INSERT ON metrics
@@ -108,10 +97,6 @@ pub async fn run_migrations(pool: &SqlitePool) -> DbResult<()> {
     .await
     .map_err(DbError::Sqlx)?;
 
-    // Refresh/session tokens — used by the server to support logout /
-    // multi-device revocation. The desktop app keeps tokens client-side only,
-    // but having the table always present keeps the schema identical between
-    // the two binaries.
     sqlx::query(
         "CREATE TABLE IF NOT EXISTS sessions (
             id          TEXT PRIMARY KEY NOT NULL,

@@ -4,9 +4,6 @@ use axum::{
 };
 
 use crate::{auth, error::ApiError, AppState};
-
-/// Extracts and validates the bearer token, returning the authenticated
-/// user's id. Use as a handler parameter: `AuthUser(user_id): AuthUser`.
 pub struct AuthUser(pub String);
 
 impl<S> FromRequestParts<S> for AuthUser

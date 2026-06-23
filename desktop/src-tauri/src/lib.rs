@@ -20,11 +20,6 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.handle().clone();
             tauri::async_runtime::block_on(async move {
-                // The desktop app stores its SQLite file under the OS-managed
-                // app-data directory. The exact same `system-pulse-db` crate
-                // (models, migrations, queries) is reused by the standalone
-                // server, which instead reads `DatabaseConfig::from_env()`
-                // pointing at a Docker volume — see crates/system-pulse-server.
                 let data_dir = app_handle
                     .path()
                     .app_data_dir()

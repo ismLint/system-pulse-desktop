@@ -15,8 +15,6 @@ async fn main() -> Result<()> {
 
     let config = AppConfig::from_env().context("failed to load config from environment")?;
 
-    // DatabaseConfig::from_env() reads DATABASE_PATH, defaulting to
-    // /data/system_pulse.db — the path mounted as a Docker volume.
     let db_config = DatabaseConfig::from_env();
     tracing::info!(path = %db_config.path.display(), "starting system-pulse-server");
 
